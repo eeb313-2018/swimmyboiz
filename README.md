@@ -14,7 +14,29 @@ National Coastal Condition Assessment 2015 Field Operations Manual. (2015). [ebo
 
 #Team description
 
-Cassandra Major: Ecology and Evolutionary Biology Year: 3 One or two skills: Plotting Dianya Major: Ecology and Evolutionary Biology Year: +4 One or two skills: plotting data Vicki Major: Ecology and Evolutionary Biology Year: 4 One or two skills: analysing data in R Lauren Major: Environmental science, conservation biology Year: 4 One or two skills: making mixed effects models and cool figures
+Cassandra
+
+- Major: Ecology and Evolutionary Biology
+- Year: 3
+- One or two skills: Plotting
+
+Dianya
+
+- Major: Ecology and Evolutionary Biology
+- Year: +4
+- One or two skills: plotting data
+
+Vicki
+
+- Major: Ecology and Evolutionary Biology
+- Year: 4
+- One or two skills: analysing data in R
+
+Lauren
+
+- Major: Environmental science, conservation biology
+- Year: 4
+- One or two skills: making mixed effects models and cool figures
 
 We dicussed at each meeting to rotate roles of faciliator, recorder and organizer so each person has a chance to use different leadership skills throughout the project.
 
