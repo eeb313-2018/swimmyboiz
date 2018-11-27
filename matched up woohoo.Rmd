@@ -1,0 +1,117 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+benth_cond_L2012 <- read_csv("https://www.epa.gov/sites/production/files/2016-11/nla2012_bentcond_08232016.csv")
+benth_count_L2012 <- read_csv("https://www.epa.gov/sites/production/files/2016-11/nla2012_wide_benthic_08232016.csv")
+benth_met_L2012 <- read_csv("https://www.epa.gov/sites/production/files/2016-11/nla2012_bentmet.csv")
+#benth_taxa_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-11/nla2012_benttaxa_wide_10272015.csv")
+```
+
+```{r}
+View(benth_cond_L2012)
+View(benth_count_L2012)
+View(benth_met_L2012)
+View(benth_taxa_L2012)
+```
+```{r}
+benth_cond_L2012 <- read_csv("https://www.epa.gov/sites/production/files/2016-11/nla2012_bentcond_08232016.csv")
+
+```
+
+
+```{r}
+env_chem_prof_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-12/nla2012_wide_profile_08232016.csv")
+env_chem_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-12/nla2012_waterchem_wide.csv")
+env_algal_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-11/nla2012_algaltoxins_08192016.csv")
+env_chloro_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-11/nla2012_chla_wide.csv")
+env_atrazine_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-11/nla2012_atrazine_08192016.csv")
+phys_hab_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-12/nla2012_wide_phab_08232016_0.csv")
+```
+
+```{r}
+phys_hab_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-12/nla2012_wide_phab_08232016_0.csv")
+View(phys_hab_L2012)
+```
+
+```{r}
+View(env_chem_prof_L2012)
+View(env_chem_L2012)
+View(env_algal_L2012)
+View(env_chloro_L2012)
+View(env_atrazine_L2012)
+```
+
+Under env_chem_prof_L2012 we have conductivity, depth, DO, Oxygen, pH and temperature
+under benth_cond_L2012 we have a general "benthic condition" tab... there are some that are considered not assessed --> could take other parameters and try to guess what status they are?
+benth_met_L2012 tells you EPT index under EPT_NIND, EPT_NTAX, EPT_PIND, EPT_PTAX
+#Benthic condition they came up with 
+```{r}
+bent_cond_select <- benth_cond_L2012 %>% 
+  select(UID, SITE_ID, BENT_COND)
+
+bent_cond_select
+
+```
+
+#Selecting important columns for benthic data
+```{r}
+
+```
+
+```{r}
+benth_cond_filtered <- benth_cond_L2012 %>%
+  select(SITE_ID, BENT_COND)
+#filtered TOTALNIND under 100 for statistical significance?
+View(benth_cond_filtered)
+```
+
+```{r}
+selected_benth_met_L2012 <- benth_met_L2012 %>% 
+  select(UID, SITE_ID, YEAR, EPT_PIND, EPT_PTAX)
+View(selected_benth_met_L2012)
+```
+
+```{r}
+env_chem_prof_L2012 <- read_csv("https://www.epa.gov/sites/production/files/2016-12/nla2012_wide_profile_08232016.csv") 
+```
+
+```{r}
+selected_env_chem_prof_L2012 <- env_chem_prof_L2012 %>%
+  dplyr::select(UID, SITE_ID, STATE, CONDUCTIVITY, DEPTH, OXYGEN, PH, TEMPERATURE)
+```
+
+```{r}
+#filtered <- selected_env_chem_prof_L2012 %>%
+  #SITE_ID[SITE_ID == ""] <- NA
+selected_env_chem_prof_L2012new <- selected_env_chem_prof_L2012 %>% 
+  mutate(SITE_ID = ifelse((SITE_ID) == "", NA, SITE_ID)) %>% 
+  filter(!is.na(SITE_ID)) %>% 
+  filter(!is.na(CONDUCTIVITY) & !is.na(DEPTH) & !is.na(OXYGEN) & !is.na(PH) & !is.na(TEMPERATURE)) %>% 
+  group_by(SITE_ID, STATE) %>% 
+  summarize(Conductivity = mean(CONDUCTIVITY),
+            Depth = mean(DEPTH),
+            Oxygen = mean(OXYGEN),
+            pH = mean(PH), 
+            Temperature = mean(TEMPERATURE))
+
+View(selected_env_chem_prof_L2012new)
+```
+
+
+```{r}
+#merged <- merge(selected_benth_met_L2012, selected_env_chem_prof_L2012new, by = "SITE_ID")
+
+merged <- right_join(selected_env_chem_prof_L2012new, selected_benth_met_L2012, by = "SITE_ID")
+merged <- merged %>%
+  filter(!is.na(STATE))
+View(merged)
+
+```

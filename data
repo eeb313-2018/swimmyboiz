@@ -120,6 +120,8 @@ env_algal_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-11/
 env_atrazine_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-11/nla2012_atrazine_08192016.csv")
 env_chloro_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-11/nla2012_chla_wide.csv")
 
+
+
 #DO in lakes 2007
 env_estDO_L2007 <- read.csv("https://www.epa.gov/sites/production/files/2014-10/nla2007_meando_conditionestimate_20091123.csv")
 env_DO_L2007 <- read.csv("https://www.epa.gov/sites/production/files/2014-10/nla2007_meando_data_20091007.csv")
@@ -129,4 +131,15 @@ env_field_chem_RS2008 <- read.csv("https://www.epa.gov/sites/production/files/20
 
 #Trophic Status in lakes 2007
 env_troph_L2007 <- read.csv("https://www.epa.gov/sites/production/files/2014-10/nla2007_trophic_conditionestimate_20091123.csv")
+```
+
+
+#Data sets that we are using
+
+```{r}
+#Benthic data 2012
+benth_met_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-11/nla2012_bentmet.csv")
+
+#Environmental variables
+env_chem_prof_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-12/nla2012_wide_profile_08232016.csv")
 ```

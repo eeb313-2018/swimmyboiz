@@ -1,0 +1,106 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+benth_cond_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-11/nla2012_bentcond_08232016.csv")
+benth_count_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-11/nla2012_wide_benthic_08232016.csv")
+benth_met_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-11/nla2012_bentmet.csv")
+#benth_taxa_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-11/nla2012_benttaxa_wide_10272015.csv")
+```
+
+```{r}
+View(benth_cond_L2012)
+View(benth_count_L2012)
+View(benth_met_L2012)
+View(benth_taxa_L2012)
+```
+
+
+```{r}
+env_chem_prof_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-12/nla2012_wide_profile_08232016.csv")
+env_chem_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-12/nla2012_waterchem_wide.csv")
+env_algal_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-11/nla2012_algaltoxins_08192016.csv")
+env_chloro_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-11/nla2012_chla_wide.csv")
+env_atrazine_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-11/nla2012_atrazine_08192016.csv")
+phys_hab_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-12/nla2012_wide_phab_08232016_0.csv")
+```
+```{r}
+phys_hab_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-12/nla2012_wide_phab_08232016_0.csv")
+View(phys_hab_L2012)
+```
+
+```{r}
+View(env_chem_prof_L2012)
+View(env_chem_L2012)
+View(env_algal_L2012)
+View(env_chloro_L2012)
+View(env_atrazine_L2012)
+```
+
+Under env_chem_prof_L2012 we have conductivity, depth, DO, Oxygen, pH and temperature
+under benth_cond_L2012 we have a general "benthic condition" tab... there are some that are considered not assessed --> could take other parameters and try to guess what status they are?
+benth_met_L2012 tells you EPT index under EPT_NIND, EPT_NTAX, EPT_PIND, EPT_PTAX
+
+
+#Selecting important columns for benthic data
+```{r}
+selected_benth_met_L2012 <- benth_met_L2012 %>% 
+  select(UID, SITE_ID, YEAR, EPT_NIND, EPT_NTAX, EPT_PIND, EPT_PTAX)
+
+View(selected_benth_met_L2012)
+```
+
+#arranging columns in benthic data, descending by site
+```{r}
+arranged_by_site_benthic <- selected_benth_met_L2012 %>% 
+  arrange(SITE_ID, desc(SITE_ID))
+
+View(arranged_by_site_benthic)
+```
+View(env_chem_prof_L2012)
+#Selecting important chem columns
+
+```{r}
+selected_env_chem_prof_L2012 <- env_chem_prof_L2012 %>%
+  dplyr::select(UID, SITE_ID, STATE, CONDUCTIVITY, DEPTH, OXYGEN, PH, TEMPERATURE)
+
+View(selected_env_chem_prof_L2012)
+
+```
+
+#Benthic condition they came up with 
+```{r}
+bent_cond_select <- benth_cond_L2012 %>% 
+  select(UID, SITE_ID, BENT_COND)
+
+bent_cond_select
+
+```
+
+
+The chem data is particularly weird in the order so we need to filter out blanks and then put it ascending or descending order so we can match it up in a new data frame with the benthic data
+We also need to filter out all NA's because there are a lot of NAs in this data set. However, it seems that some of those NAs are because it is the same site so they just did not bother putting some data in multiple times so will need to check this.
+
+
+
+```{r}
+COND <- selected_env_chem_prof_L2012 %>%
+  filter(!is.na(CONDUCTIVITY) & !is.na(DEPTH) & !is.na(OXYGEN) & !is.na(PH) & !is.na(TEMPERATURE)) %>%
+   group_by(SITE_ID)
+
+
+
+
+#filter(!is.na(CONDUCTIVITY)) %>%
+  #summarise(avg = mean(CONDUCTIVITY)) %>%
+  #arrange(avg)
+
+
+View(COND)
