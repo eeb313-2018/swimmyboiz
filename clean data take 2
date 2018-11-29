@@ -1,0 +1,139 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+library(tidyverse)
+library(MuMIN)
+```
+
+```{r}
+bent_water_chem <- read_csv("https://www.epa.gov/sites/production/files/2016-12/nla2012_waterchem_wide.csv")
+```
+
+```{r}
+
+benth_met_L2012 <- read_csv("https://www.epa.gov/sites/production/files/2016-11/nla2012_bentmet.csv")
+```
+
+```{r}
+env_chem_prof_L2012 <- read_csv("https://www.epa.gov/sites/production/files/2016-12/nla2012_wide_profile_08232016.csv")
+```
+
+```{r}
+env_chem_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-12/nla2012_waterchem_wide.csv")
+```
+
+```{r}
+bent_met_select <- benth_met_L2012 %>% 
+  select(SITE_ID, EPT_PTAX) %>% 
+  filter(!is.na(EPT_PTAX))
+```
+
+```{r}
+env_chem_prof_L2012 <- read_csv("https://www.epa.gov/sites/production/files/2016-12/nla2012_wide_profile_08232016.csv") 
+```
+
+```{r}
+selected_env_chem_prof_L2012 <- env_chem_prof_L2012 %>%
+  dplyr::select(UID, SITE_ID, STATE, CONDUCTIVITY, DEPTH, OXYGEN, PH, TEMPERATURE)
+```
+
+```{r}
+selected_env_chem_prof_L2012new <- selected_env_chem_prof_L2012 %>% 
+  mutate(SITE_ID = ifelse((SITE_ID) == "", NA, SITE_ID)) %>% 
+  filter(!is.na(SITE_ID)) %>% 
+  filter(!is.na(CONDUCTIVITY) & !is.na(DEPTH) & !is.na(OXYGEN) & !is.na(PH) & !is.na(TEMPERATURE)) %>% 
+  group_by(SITE_ID, STATE) %>% 
+  summarize(Conductivity = mean(CONDUCTIVITY),
+            Depth = mean(DEPTH),
+            Oxygen = mean(OXYGEN),
+            pH = mean(PH), 
+            Temperature = mean(TEMPERATURE))
+```
+
+```{r}
+merged <- right_join(selected_env_chem_prof_L2012new, bent_met_select, by = "SITE_ID")
+
+merged <- merged %>%
+  filter(!is.na(STATE))
+
+merged <- merged %>% 
+  dplyr::select(Conductivity, Depth, pH, Temperature, Oxygen, EPT_PTAX , SITE_ID)
+```
+
+```{r}
+merged %>% 
+  ggplot(aes(x = Temperature)) +
+  geom_histogram()
+
+merged <- merged %>%
+  mutate(Temperature = ifelse(Temperature > 50, NA, Temperature)) %>% 
+  filter(!is.na(Temperature))
+
+merged %>%
+  ggplot(aes(x = Temperature, y = EPT_PTAX)) +
+  geom_point()
+```
+
+```{r}
+model_sat <- lm(EPT_PTAX ~ Conductivity*Depth*Oxygen + Conductivity*Depth*pH + Conductivity*Depth*Temperature + Conductivity*Oxygen*pH + Conductivity*Oxygen*Temperature + Conductivity*pH*Temperature + Conductivity*Oxygen*pH + Conductivity*pH*Temperature + Oxygen*pH*Temperature + Conductivity*Oxygen*Temperature, data = merged)
+
+options(na.action = "na.fail")
+
+Model_dredge <- dredge(model_sat, beta = F, evaluate = T, rank = AIC)
+
+options(na.action = "na.omit")
+
+summary(Model_dredge)
+View(Model_dredge)
+
+#Conductivity, depth, oxygen, pH, temperature 
+
+#options(na.action = "na.omit")
+
+#stepAIC_mod <- stepAIC(model_sat, direction = "backward")
+#?stepAIC
+#stepAIC_mod
+
+#options(na.action = "na.fail")
+
+#read up on step AIC and how to interpret it
+#will end up with a reuduced model and then put that one into dredge 
+#if still have too many go back to drawing board and try to figure out what matters most
+#do not include anything over a 3 way interaction, because anything more is too complex 
+
+#if you have x:y:z you need to have x:y, x:z, y:z, z, y, x
+
+#if you think the interaction between x and y are important than you need to include x and y seperately too
+
+#look into results of AIC
+
+#start with a model that does not include any interactions above a 3 way because it will get too complicated 
+```
+
+```{r}
+top_model <- get.models(Model_dredge, subset = delta <= 2)
+top_model
+summary(top_model)
+```
+
+```{r}
+summary(model.avg(top_model))
+```
+
+```{r}
+model_selected <- lm(EPT_PTAX ~ Conductivity + Depth + Oxygen + pH + Temperature + Conductivity:Depth + Conductivity:Oxygen + Conductivity:pH + Conductivity:Temperature + Depth:Oxygen + Depth:pH + Oxygen:pH + pH:Temperature + Conductivity:Oxygen:pH + Depth:Temperature + Conductivity:pH:Temperature + Oxygen:Temperature + Conductivity:Depth:pH + Conductivity:Depth:Oxygen , data = merged)
+
+plot(model_selected)
+
+summary(model_selected)
+```
+
+
+
+##References for future citations
+https://link.springer.com/content/pdf/10.1186%2F2052-336X-12-30.pdf
+* The most important water quality parameters in terms of impact on aquatic ecosystems include temperature, salinity, acidity, Total Dissolved Solids (TDS), pH, DO and BOD5.* 
