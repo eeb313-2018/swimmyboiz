@@ -1,0 +1,5 @@
+Model,df,logLik,AIC,delta,weight,Adjusted R-squared,
+Model with No Interactions,6,-3351.59,6715.19,0,0.39,0.07298,*
+Model with Conductivity and Temperature Interactions,7,3351.02,6716.03,0.85,0.25,0.07313,
+Model with Oxygen and Temperature Interactions,7,-3351.35,6716.7,1.51,0.18,7.24E-02,
+Model with Depth and Temperature Interactions,7,-3351.37,6716.73,1.55,0.18,0.07257,

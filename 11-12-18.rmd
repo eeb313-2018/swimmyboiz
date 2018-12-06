@@ -1,0 +1,315 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+library(tidyverse)
+```
+```{r}
+bent_water_chem <- read_csv("https://www.epa.gov/sites/production/files/2016-12/nla2012_waterchem_wide.csv")
+View(bent_water_chem)
+```
+
+```{r}
+benth_cond_L2012 <- read_csv("https://www.epa.gov/sites/production/files/2016-11/nla2012_bentcond_08232016.csv")
+benth_count_L2012 <- read_csv("https://www.epa.gov/sites/production/files/2016-11/nla2012_wide_benthic_08232016.csv")
+benth_met_L2012 <- read_csv("https://www.epa.gov/sites/production/files/2016-11/nla2012_bentmet.csv")
+#benth_taxa_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-11/nla2012_benttaxa_wide_10272015.csv")
+```
+
+```{r}
+View(benth_cond_L2012)
+View(benth_count_L2012)
+View(benth_met_L2012)
+View(benth_taxa_L2012)
+```
+```{r}
+benth_cond_L2012 <- read_csv("https://www.epa.gov/sites/production/files/2016-11/nla2012_bentcond_08232016.csv")
+
+```
+
+```{r}
+env_chem_prof_L2012 <- read_csv("https://www.epa.gov/sites/production/files/2016-12/nla2012_wide_profile_08232016.csv")
+
+```
+
+```{r}
+env_chem_prof_L2012 <- read_csv("https://www.epa.gov/sites/production/files/2016-12/nla2012_wide_profile_08232016.csv")
+env_chem_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-12/nla2012_waterchem_wide.csv")
+env_algal_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-11/nla2012_algaltoxins_08192016.csv")
+env_chloro_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-11/nla2012_chla_wide.csv")
+env_atrazine_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-11/nla2012_atrazine_08192016.csv")
+phys_hab_L2012 <- read.csv("https://www.epa.gov/sites/production/files/2016-12/nla2012_wide_phab_08232016_0.csv")
+```
+```{r}
+View(phys_hab_L2012)
+```
+```{r}
+env_lakes_2012_cond_cats <- read_csv("https://www.epa.gov/sites/production/files/2016-12/nla_2012_condition_categories.csv")
+```
+
+
+```{r}
+phys_hab_L2012 <- read_csv("https://www.epa.gov/sites/production/files/2016-12/nla2012_wide_phabmet_10202016.csv")
+View(phys_hab_L2012)
+```
+```{r}
+View(phys_hab_L2012)
+```
+
+```{r}
+View(env_chem_prof_L2012)
+View(env_chem_L2012)
+View(env_algal_L2012)
+View(env_chloro_L2012)
+View(env_atrazine_L2012)
+```
+
+Under env_chem_prof_L2012 we have conductivity, depth, DO, Oxygen, pH and temperature
+under benth_cond_L2012 we have a general "benthic condition" tab... there are some that are considered not assessed --> could take other parameters and try to guess what status they are?
+benth_met_L2012 tells you EPT index under EPT_NIND, EPT_NTAX, EPT_PIND, EPT_PTAX
+#Benthic condition they came up with 
+```{r}
+bent_cond_select <- benth_cond_L2012 %>% 
+  dplyr::select(UID, SITE_ID, BENT_COND, RICH_PT, TOLR_PT, DIVS_PT) 
+
+bent_cond_select
+
+```
+
+#Selecting important columns for benthic data
+library(tidyverse)
+
+```{r}
+benth_cond_filtered <- benth_cond_L2012 %>%
+  dplyr::select(SITE_ID, BENT_COND, RICH_PT, TOLR_PT, DIVS_PT) %>% 
+  filter(!is.na(RICH_PT))
+#filtered TOTALNIND under 100 for statistical significance?
+View(benth_cond_filtered)
+```
+
+```{r}
+env_atrazine_L2012_filtered <- env_atrazine_L2012 %>% 
+  dplyr::select(SITE_ID, ATRAZINE_RESULT)
+
+```
+
+```{r}
+env_lakes_2012_cond_cats_selected <- env_lakes_2012_cond_cats %>% 
+  dplyr::select(SITE_ID, LAKE_ORIGIN12, MISS_BASIN, OWN_TYPE, SIZE_CLASS, NTL_COND, ACID_CLS, TURB_COND, MICX_DETECT, SEDHG_MTH_TOP_COND, ZOOP_COND, DIS_O2_CLS, TROPHIC_STATE, MICX_REC)
+```
+
+
+```{r}
+selected_benth_met_L2012 <- benth_met_L2012 %>% 
+  dplyr::select( SITE_ID, YEAR, EPT_PIND, EPT_PTAX, EPT_NTAX, WTD_TV)
+View(selected_benth_met_L2012)
+```
+
+```{r}
+env_chem_prof_L2012 <- read_csv("https://www.epa.gov/sites/production/files/2016-12/nla2012_wide_profile_08232016.csv") 
+```
+```{r}
+selected_env_chem_prof_L2012 <- env_chem_prof_L2012 %>%
+  dplyr::select(UID, SITE_ID, STATE, CONDUCTIVITY, DEPTH, OXYGEN, PH, TEMPERATURE)
+```
+
+```{r}
+selected_phys_hab_L2012 <- phys_hab_L2012 %>% 
+  dplyr::select(SITE_ID, HIIAGCIRCA_RIP)
+View(selected_phys_hab_L2012)
+```
+
+
+```{r}
+#filtered <- selected_env_chem_prof_L2012 %>%
+  #SITE_ID[SITE_ID == ""] <- NA
+selected_env_chem_prof_L2012new <- selected_env_chem_prof_L2012 %>% 
+  mutate(SITE_ID = ifelse((SITE_ID) == "", NA, SITE_ID)) %>% 
+  filter(!is.na(SITE_ID)) %>% 
+  filter(!is.na(CONDUCTIVITY) & !is.na(DEPTH) & !is.na(OXYGEN) & !is.na(PH) & !is.na(TEMPERATURE)) %>% 
+  group_by(SITE_ID, STATE) %>% 
+  summarize(Conductivity = mean(CONDUCTIVITY),
+            Depth = mean(DEPTH),
+            Oxygen = mean(OXYGEN),
+            pH = mean(PH), 
+            Temperature = mean(TEMPERATURE))
+
+View(selected_env_chem_prof_L2012new)
+```
+
+
+```{r}
+#merged <- merge(selected_benth_met_L2012, selected_env_chem_prof_L2012new, by = "SITE_ID")
+
+merged <- right_join(selected_env_chem_prof_L2012new, selected_benth_met_L2012, by = "SITE_ID")
+
+merged <- right_join(merged, benth_cond_filtered, by = "SITE_ID")
+
+merged <- right_join(merged, env_atrazine_L2012_filtered, by = "SITE_ID")
+
+merged <- right_join(merged, env_lakes_2012_cond_cats_selected, by = "SITE_ID")
+merged <- right_join(merged, selected_phys_hab_L2012, by = "SITE_ID")
+merged <- merged %>%
+  filter(!is.na(STATE))
+View(merged)
+
+###update at 2:46pm 2018-11-27
+merged <- merged %>%
+  select(Conductivity, Depth, pH, Temperature, Oxygen, RICH_PT, SITE_ID)
+
+
+```
+```{r}
+
+
+merged <- merged %>%
+  mutate(Temperature = ifelse(Temperature > 50, NA, Temperature)) %>% 
+  filter(!is.na(Temperature))
+
+merged %>%
+  ggplot(aes(x = Temperature, y = RICH_PT)) +
+  geom_point()
+```
+
+```{r}
+merged <- merged %>%
+  filter(
+
+
+
+```
+
+
+
+```{r}
+library(multcomp)
+merged$BENT_COND <- as.factor(merged$BENT_COND)
+summary(lm(pH ~ BENT_COND, data = merged))
+result <- lm(pH ~ BENT_COND, data = merged)
+postHocs<-glht(result, linfct = mcp(BENT_COND = "Tukey"))
+#summary function gives results of multiple comparisons
+summary(postHocs)
+```
+
+
+
+model selection and dredge
+```{r}
+install.packages("MuMIn")
+library(MuMIn)
+```
+
+```{r}
+#library(MuMIn)
+model_sat <- lm(RICH_PT ~ logged_conductivity*logged_depth*Oxygen +logged_conductivity*logged_depth*pH + logged_conductivity*logged_depth*Temperature + logged_conductivity*Oxygen*pH + logged_conductivity*Oxygen*Temperature + logged_conductivity*pH*Temperature + logged_depth*Oxygen*pH + logged_depth*pH*Temperature + Oxygen*pH*Temperature + logged_depth*Oxygen*Temperature, data = merged)
+
+Model_dredge <- dredge(model_sat, beta = F, evaluate = T, rank = AIC)
+
+options(na.action = "na.omit")
+
+summary(Model_dredge)
+View(Model_dredge)
+
+logged_depth
+
+
+#Conductivity, depth, oxygen, pH, temperature 
+
+
+#options(na.action = "na.omit")
+
+#stepAIC_mod <- stepAIC(model_sat, direction = "backward")
+#?stepAIC
+#stepAIC_mod
+
+#options(na.action = "na.fail")
+
+
+
+#read up on step AIC and how to interpret it
+#will end up with a reuduced model and then put that one into dredge 
+#if still have too many go back to drawing board and try to figure out what matters most
+#do not include anything over a 3 way interaction, because anything more is too complex 
+
+
+#if you have x:y:z you need to have x:y, x:z, y:z, z, y, x
+
+
+#if you think the interaction between x and y are important than you need to include x and y seperately too
+
+#look into results of AIC
+
+#start with a model that does not include any interactions above a 3 way because it will get too complicated 
+
+
+
+```
+
+```{r}
+top_model <- get.models(Model_dredge, subset = delta <= 2)
+top_model
+
+summary(top_model)
+
+
+```
+
+```{r}
+summary(model.avg(top_model))
+
+```
+
+```{r}
+model_selected <- lm(RICH_PT ~ Depth + pH + Temperature + Oxygen:pH  + Oxygen:Temperature + pH:Temperature + Depth:Oxygen:pH + Depth:Oxygen:Temperature + Oxygen:pH:Temperature, data = merged)
+plot(model_selected)
+
+summary(model_selected)
+
+
+#report table of model and bold significant one
+
+
+```
+
+```{r}
+merged %>% 
+  ggplot(aes(x = log10(Depth))) +
+  geom_histogram()
+
+merged %>%
+  ggplot(aes(x = pH)) +
+  geom_histogram()
+
+merged %>% 
+  ggplot(aes(x = Oxygen)) +
+  geom_histogram()
+
+merged %>% 
+  ggplot(aes(x = log10(Conductivity))) +
+  geom_histogram()
+
+
+#pH and oxygen are totally fine, depth is left skewed (should we log it), conductivity def needs to be logged
+```
+
+
+```{r}
+install.packages("scatterplot3d", dependencies = TRUE)
+library(scatterplot3d)
+#scatterplot3d(x = data$x, y = data$y, z = data$z)
+
+
+
+scatterplot3d(x = merged$Oxygen, y = merged$RICH_PT, z = merged$PH, highlight.3d=TRUE, )
+```
+
+
+
+
+
+##References for future citations
+https://link.springer.com/content/pdf/10.1186%2F2052-336X-12-30.pdf
+* The most important water quality parameters in terms of impact on aquatic ecosystems include temperature, salinity, acidity, Total Dissolved Solids (TDS), pH, DO and BOD5.* 

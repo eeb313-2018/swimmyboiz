@@ -44,6 +44,7 @@ View(phys_hab_L2012)
 ```{r}
 View(env_chem_prof_L2012)
 View(env_chem_L2012)
+#head(env_chem_L2012)
 View(env_algal_L2012)
 View(env_chloro_L2012)
 View(env_atrazine_L2012)
